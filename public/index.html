@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>Hear Me Out - Ticketing</title>
+
+  <!-- Link to your CSS file -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Fonts (League Spartan and Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=League+Spartan:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Satoshi&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jersey+25:wght@400&display=swap" rel="stylesheet">
+
+
+
+  <!-- Razorpay Script (commented out for now) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+
+
+
+  <!-- <div class="background-overlay" aria-hidden="true"></div> -->
+
+  <!-- Loader Screen -->
+  <!-- Loader Screen -->
+<div id="screen-loader" class="screen active">
+  <div class="loader-inner">
+    <!-- You can remove this text later if you’d like -->
+    <p class="loader-text">Loading your ticket…</p>
+
+    <!-- Placeholder GIF – replace src with your actual file later -->
+    <img
+      src="assets/loader-placeholder.gif"
+      alt="Loading..."
+      class="loader-gif"
+    />
+  </div>
+</div>
+
+
+  <!-- Screen containers -->
+  <div id="screen-welcome" class="screen">
+    <div>   
+      <!-- <br><br> -->
+        <h1 id="welcome-title">Hey, Attendee</h1>
+        <!-- <h1 class="shimmer">Hello</h1> -->
+        <p id="welcome-message">Are you ready to <br> Hear Me Out?</p>
+        <br>
+        <button onclick="goToScreen('basic-info')">→</button>
+    </div>
+  </div>
+
+  <div id="screen-basic-info" class="screen">
+    <h2>Basic Info</h2>
+    <br><br><br>
+    <div class="form-stack">  
+      <strong><p style="margin-left: 27px;">Full Name</p></strong>
+      <input type="text" id="fullname">
+      <strong><p style="margin-left: 27px;">Date of Birth</p></strong>
+      <input type="text" id="DOB" placeholder="DD/MM/YYYY">
+      <strong><p style="margin-left: 27px;">Phone Number</p></strong>
+      <input type="text" id="mobile">
+      <strong><p style="margin-left: 27px;">Email ID</p></strong>
+      <input type="email" id="email">
+      <button onclick="validateBasicInfo()">→</button>
+    </div>
+  </div>
+
+  
+  
+
+<div id="screen-checkout" class="screen">
+  <h2 id="checkout-title-main">Confirm</h2>
+  <h3 id="checkout-title-sub">your spot</h3>
+  <div id="checkout-glass-card">
+    <div class="checkout-card-content">
+      <p class="checkout-event-title">
+        Hear Me Out <strong>at Candles</strong>
+      </p>
+
+      <div class="checkout-details">
+        <p><span>Date</span> | 31 Dec 2025</p>
+        <p><span>Time</span> | 8pm – 1am</p>
+        <p>
+          <span>Ticket Price</span> | ₹
+          <span id="checkout-ticket-price">—</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+ <div id="checkout-actions">
+  <div id="checkout-terms">
+    <label class="terms-checkbox">
+      <input type="checkbox" id="checkout-terms-checkbox" />
+      <span>
+        Accept
+        <a href="#" id="checkout-terms-link">terms and conditions</a>
+      </span>
+    </label>
+  </div>
+
+  <button id="checkout-pay-btn">Proceed to Pay</button>
+  <!-- Share section -->
+  <div id="checkout-share">
+    <p class="checkout-share-text">
+      Share this link to bring your homies
+    </p>
+
+    <button id="checkout-share-btn" aria-label="Share link">
+      <img src="assets/Icon.png" alt="Share icon" />
+    </button>
+  </div>
+
+</div>
+</div>
+
+  
+
+  <div id="screen-confirmation" class="screen">
+    <div id="confirmation-old-ui">  
+      <h2>You're All Set!</h2>
+      <p style="margin-left: 15px;">Thank you for your purchase. Details will be sent to your number and email. See you there!</p>
+      <strong><p style="margin-left: 15px;">Ticket confirmation number: <span id="confirmation-id">#123ABC</span></p></strong>
+      <p style="margin-left: 15px;">Hold to save your ticket and share it on your story 👇</p>
+      <img id="ticket-image" src="assets/Latest-tix.jpg" alt="Ticket" />
+      <a id="download-button" href="assets/Latest-tix.jpg" download="Tix.jpg">
+          <button>Download Ticket</button>
+      </a>
+    </div>
+    <img
+      src="assets/Layer_1.png"
+      alt="Confirmation icon"
+      id="confirmation-icon"
+    />
+    <p id="confirmation-status-text">
+      YOUR TICKET IS <strong>CONFIRMED!</strong>
+    </p>
+    <div id="confirmation-ticket-wrapper">
+      <p id="confirmation-download-hint">
+        Press and hold to download ticket
+      </p>
+      <img
+        src="assets/ticket-final 1.png"
+        alt="Your ticket"
+        id="confirmation-ticket-image"
+      />
+    </div>
+
+
+
+
+
+</div>
+
+
+  <!-- Background Logo -->
+  <!-- <img src="assets/ape1.png" id="bottom-graphic"> -->
+  
+
+  <!-- Link to your JavaScript file -->
+  <script src="script.js" defer></script>
+
+  <!-- Terms & Conditions Modal -->
+  <div id="terms-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Terms & Conditions</h2>
+      <div>
+        <p><strong>By proceeding with this booking, you agree to the following:</strong></p>
+  
+        <p><strong>No Cancellations or Refunds</strong><br>
+        Once your booking is complete, it is final. No cancellations or refunds will be permitted under any circumstances.</p>
+  
+        <p><strong>Alcohol Policy</strong><br>
+        All guests must be 21 years or older to attend. Underage drinking is strictly prohibited. Outside alcohol is not allowed, and guests are expected to consume responsibly. Anyone found violating this policy may be removed from the event.</p>
+  
+        <p><strong>No Narcotics or Illegal Substances</strong><br>
+        The possession or use of narcotics or illegal substances is strictly prohibited.</p>
+  
+        <p><strong>Respect the Venue</strong><br>
+        Any damage to Candle’s property will not be tolerated and may result in penalties.</p>
+  
+        <p><strong>Zero Tolerance for Misconduct</strong><br>
+        Any form of misbehavior or misconduct will lead to immediate removal from the event, with no refund.</p>
+
+        <p><strong>Media & Recording Permissions</strong><br>
+          By attending this event, you consent to being photographed, filmed, or recorded. Such media may be used by the organizers for promotional, marketing, and archival purposes. No compensation will be provided for such use.</p>
+        
+  
+        <p>This is a property of Ajan Media Private Limited.</p>
+  
+        <hr>
+  
+        <p><strong>Cancellation & Refund Policy</strong><br>
+        – No Cancellations or Refunds<br>
+        Once your booking is complete, it is final. No cancellations or refunds will be permitted under any circumstances.</p>
+  
+        <p><strong>Privacy Policy</strong><br>
+        At Hear Me Out, we respect your privacy and are committed to protecting the personal information you share with us.</p>
+  
+        <p><strong>What We Collect</strong><br>
+        When you book a spot at our event, we collect the following information from you:<br>
+        – Name<br>
+        – Phone number<br>
+        – Email address<br>
+        – Date of birth</p>
+  
+        <p><strong>How We Use It</strong><br>
+        This information is used solely to:<br>
+        – Confirm your booking and send event details<br>
+        – Communicate essential updates (including location, timing, and changes)<br>
+        – Verify age eligibility for entry<br>
+        – Occasionally share future event invites or announcements (you can opt out anytime)</p>
+  
+        <p><strong>Cookies & Tracking</strong><br>
+        We do not use cookies to track your activity or behaviour. The only data we receive is what you provide directly through the booking form.</p>
+  
+        <hr>
+  
+        <p><strong>Shipping & Delivery Policy</strong></p>
+  
+        <p><strong>Shipping Policy</strong><br>
+        At Hear Me Out, all tickets are delivered digitally.</p>
+  
+        <p><strong>No Physical Shipping</strong><br>
+        We do not ship any physical products or tickets. You will not be asked for a shipping address during the booking process.</p>
+  
+        <p><strong>Digital Ticket Delivery</strong><br>
+        Once your booking is confirmed, your ticket and event details will be sent to the email address you provided. Please ensure your email is entered correctly at checkout.<br>
+        If you do not receive your ticket within 24 hours of booking, please check your spam folder or reach out to us at <a href="mailto:hearmeout.work@gmail.com">hearmeout.work@gmail.com</a></p>
+  
+        <hr>
+  
+        <p><strong>Contact Us</strong><br>
+        <a href="mailto:hearmeout.work@gmail.com">📧 hearmeout.work@gmail.com</a><br>
+        📞 9980524564<br>
+        🏢 Ajan Media, 632/1, Old Post Office Road,<br>
+        Banashankari 7th Block,<br>
+        Bengaluru 560070.</p>
+      </div>
+    </div>
+  </div>
+  
+  
+
+
+
+</body>
+</html>

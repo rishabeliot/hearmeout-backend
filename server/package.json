@@ -1,0 +1,17 @@
+{
+  "name": "hearmeout-backend",
+  "version": "1.0.0",
+  "description": "Backend for Hear Me Out ticketing",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "nodemailer": "^7.0.11",
+    "sqlite3": "^5.1.7"
+  }
+}
+

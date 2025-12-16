@@ -1,0 +1,1209 @@
+/* Background image with overlay */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  color: white;
+
+  /* Let the page grow naturally */
+  height: auto;
+  min-height: 100%;
+
+  /* Enable scrolling */
+  overflow-y: auto;
+
+  /* Background image + fallback color */
+  /* background: #ecebeb url('assets/Monkey.png') no-repeat center center fixed; */
+  background-size: cover;
+
+  position: relative;
+  z-index: 0;
+}
+
+/* ---------- Fixed high-res background (keeps page scrollable) ---------- */
+
+/* background container sits behind everything and stays fixed */
+.bg-fixed {
+  display: none;
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  background-image: none; /* <-- replace with your image path */
+  background-size: cover;           /* cover entire viewport */
+  background-position: center center;
+  background-repeat: no-repeat;
+  will-change: transform;
+  z-index: -2;                       /* behind overlay and screens */
+  pointer-events: none;              /* makes clicks go to UI elements above */
+  filter: none;                      /* optionally apply filter: blur(1px) or brightness() */
+}
+
+/* your overlay should sit above the background but behind content */
+.background-overlay {
+  z-index: -1; /* ensure overlay sits over the bg but behind .screen (which is z-index:1) */
+}
+
+/* ensure .screen stays above both overlay and bg */
+.screen {
+  z-index: 1; /* already set in existing css, but included here to be explicit */
+}
+
+
+
+/* bottom-graphic should remain behind content (keep original behavior) */
+#bottom-graphic {
+  z-index: 0;
+}
+
+/* Small mobile note: using a fixed element avoids background-attachment issues on mobile. */
+/* Screen-specific background layers */
+.screen::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+
+/* Welcome background */
+#screen-welcome.active::before {
+  background-image: url("assets/Welcome_bg.png");
+  opacity: 1;
+}
+
+/* Basic Info background */
+#screen-basic-info.active::before {
+  background-image: url("assets/Basic_info_bg.png");
+  opacity: 1;
+}
+
+#screen-checkout.active::before {
+  background-image: url("assets/Checkout_bg.png");
+  opacity: 1;
+}
+
+/* TEMP: disable old checkout layout */
+#screen-checkout .checkout-wrapper {
+  display: none;
+}
+
+#screen-checkout {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#screen-checkout.active {
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+/* Checkout title: "Confirm" */
+#checkout-title-main {
+  position: absolute;
+  left: 45px;
+  top: 65px;
+
+  font-family: 'Jersey 25', sans-serif;
+  font-size: 100px;
+  line-height: 100px;
+  font-weight: 400;
+  color: white;
+  z-index: 2;
+  letter-spacing: -5px;
+
+  margin: 0;
+}
+
+/* Checkout subtitle: "your spot" */
+#checkout-title-sub {
+  position: absolute;
+  left: 95px;
+  top: 132px;
+
+  font-family: 'Jersey 25', sans-serif;
+  font-size: 70px;
+  line-height: 70px;
+  font-weight: 400;
+  color: white;
+  letter-spacing: -3.5px;
+
+  margin: 0;
+  z-index: 2;
+}
+
+/* Checkout glass card */
+#checkout-glass-card {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 170px;              /* overlaps "your spot" slightly */
+
+  width: 285px;
+  height: 326px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  box-shadow: 0 8px 24px rgba(4, 4, 6, 0.4);
+  z-index: 1;
+}
+
+/* Inner content wrapper */
+.checkout-card-content {
+  padding: 70px 20px 24px;
+}
+
+/* Event title */
+.checkout-event-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 36px;
+  line-height: 32px;
+  font-weight: 200;
+  color: white;
+
+  margin: 20px 0 38px 0;
+}
+
+/* Terms container */
+#checkout-terms {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Checkbox + text */
+.terms-checkbox {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terms-checkbox input {
+  accent-color: white;
+  cursor: pointer;
+}
+
+.terms-checkbox a {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Proceed to Pay button */
+#checkout-pay-btn {
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 18px;
+  border-radius: 30px;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: white;
+
+  box-shadow: 0 8px 24px rgba(4,4,6,0.4);
+  cursor: pointer;
+}
+
+#checkout-pay-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.08);
+}
+
+/* Checkout actions (terms + pay button) */
+#checkout-actions {
+  position: absolute;
+  top: 490px;              /* 👈 directly below the glass card */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  z-index: 2;              /* above card, below titles */
+}
+
+.terms-checkbox input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid white;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+}
+
+.terms-checkbox input:checked::after {
+  content: '✓';
+  font-size: 12px;
+  color: black;
+}
+
+.terms-checkbox input:checked {
+  background: white;
+}
+
+/* Share section wrapper */
+#checkout-share {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: row;        /* inline */
+  align-items: center;
+  justify-content: center;    /* center as a group */
+  gap: 12px;
+}
+
+
+/* Share text */
+.checkout-share-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: white;
+  text-align: center;
+  margin: 0;
+}
+
+/* Share icon button (glass) */
+#checkout-share-btn {
+  width: 26px;                 /* 50% of 52 */
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 13px;         /* rounder relative to size */
+
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  box-shadow: 0 6px 18px rgba(4,4,6,0.4);
+  cursor: pointer;
+}
+
+#checkout-share-btn img {
+  width: 11px;                 /* 50% of 22 */
+  height: 11px;
+}
+
+
+#checkout-share-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.08);
+}
+
+/* TEMP: hide old confirmation UI */
+#confirmation-old-ui {
+  display: none;
+}
+
+
+
+/* Bold part ("at Candles") */
+.checkout-event-title strong {
+  font-weight: 700;
+}
+
+/* Details block */
+.checkout-details p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  line-height: 28px;
+  color: white;
+
+  margin: 0 0 2px 0;
+}
+
+/* Left labels (Date / Time / Ticket Price) */
+.checkout-details span {
+  font-weight: 600;
+}
+
+
+
+
+.background-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0,0,0,0.85), rgba(41,38,38,0.85));
+  z-index: -1;
+}
+
+/* Hide all screens except the active one */
+.screen {
+  position: relative;
+  width: 100%;
+  min-height: calc(var(--vh, 1vh) * 100);
+  padding: 40px 20px;
+  box-sizing: border-box;
+
+  /* hidden by default */
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  /* layout */
+  display: none;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Center the loader content nicely */
+/* Loader screen: full black overlay */
+#screen-loader {
+  position: fixed;
+  inset: 0;                  /* top:0; right:0; bottom:0; left:0 */
+  background: #000;          /* pure black */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;               /* above everything else */
+}
+
+.loader-inner {
+  text-align: center;
+}
+
+.loader-text {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.loader-gif {
+  width: 220px;     /* adjust size as you like */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+
+
+
+/* Titles styling */
+h1 {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 70px;
+  margin-bottom: 6px;
+  margin-top: 60px;
+  margin-left: 5px;
+  color: black;
+  /* color: #1c1c10; */
+}
+
+h2 {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 50px;
+  margin-bottom: 15px;
+  margin-top: 5px;
+  margin-left: 15px;
+  color: #1c1c10;
+  /* color: #aaa; */
+}
+
+h3 {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 30px;
+  margin-bottom: 5px;
+  margin-top: 3px;
+  margin-left: 15px;
+  color: #1c1c10;
+}
+
+/* Main black card */
+.checkout-card {
+  background: #000;                  /* solid black card */
+  color: #fff;
+  border-radius: 20px;               /* smooth round corners */
+  padding: 28px 22px;                /* internal spacing */
+  width: 50vw;                       /* half of viewport width on larger screens */
+  max-width: 420px;                  /* prevents card becoming excessively wide */
+  min-width: 260px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  text-align: center;                  /* left-align all textual content */
+  margin-left: 25px;                 /* keeps the card slightly inset from the left edge */
+  margin-bottom: 18px;
+  
+  box-sizing: border-box;
+}
+
+.checkout-heading {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 32px;
+  margin: 0 0 10px 0;
+  color: #ffffff;
+  line-height: 1.02;
+}
+
+/* regular lines inside the card (date/time/venue) */
+.checkout-line {
+  margin: 10px 0;
+  color: #ffffff;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+/* small centered subcard for price + admits */
+.checkout-subcard {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: #121212;                /* slightly different black for contrast */
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 15px;
+  margin: 16px auto 0 auto;          /* centers subcard horizontally inside the checkout-card */
+}
+
+/* small note at bottom of card */
+.checkout-note {
+  margin-top: 16px;
+  color: #ffffff;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* actions (terms + payment button) under the card */
+.checkout-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 20px; /* align with left inset used on card */
+  margin-top: 8px;
+}
+
+/* terms label styling */
+.terms-label {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* checkout CTA button */
+.checkout-button {
+  width: 220px;
+  padding: 12px 18px;
+  background: #111;
+  color: #fff;
+  border-radius: 24px;
+  border: 0;
+  cursor: pointer;
+  align-self: flex-start; /* keep the button aligned left with card */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+
+/* Responsive behaviour: on small screens expand the card to be comfortable */
+@media (max-width: 768px) {
+  .checkout-card {
+    width: calc(100% - 40px);  /* nearly full width with small side padding */
+    max-width: none;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 22px;
+  }
+
+  .checkout-heading { font-size: 28px; }
+  .checkout-button { width: 100%; align-self: stretch; text-align: center; }
+  .checkout-wrapper { padding: 18px 10px; }
+  .checkout-actions { margin-left: 10px; margin-right: 10px; }
+} 
+
+.checkout-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* aligns card to the left by default */
+  padding: 28px;
+  box-sizing: border-box;
+}
+
+/* Dot separator */
+.checkout-subcard .dot {
+  font-size: 18px;
+  line-height: 1;
+  color: #aaa;
+}
+
+
+/* OVERRIDE SCREEN styling: top-left with ample padding */
+#screen-override {
+  display: flex;
+  align-items: flex-start;      /* vertical: start -> top */
+  justify-content: flex-start;  /* horizontal: start -> left */
+  min-height: calc(var(--vh, 1vh) * 100);
+  box-sizing: border-box;
+  padding: 80px 48px;           /* change these numbers to increase/decrease padding */
+}
+
+#screen-override .override-inner {
+  max-width: 100%;              /* keep it responsive */
+}
+
+#screen-override h1 {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 45px;              /* your requested size */
+  margin: 0;
+  color: #1c1c10;
+  text-align: left;
+  line-height: 1.05;
+}
+
+/* smaller screens: reduce padding and font-size so it doesn't feel cramped */
+@media (max-width: 480px) {
+  #screen-override {
+    padding: 40px 20px;
+  }
+  #screen-override h1 {
+    font-size: 32px;
+  }
+}
+
+
+/* Highlighted word */
+.highlight {
+  color: #595959;
+}
+
+/* Input box styling */
+.input-label {
+  margin: 5px 0 2px 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 27px;
+}
+
+
+
+.shimmer {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 48px;
+  text-align: center;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+
+  /* base color (seen when no shine is over it) */
+  color: #fff;
+
+  /* make the text act as a mask for background */
+  background: linear-gradient(
+    90deg,
+    #fff 20%,
+    rgba(255, 255, 255, 0.3) 40%,
+    #fff 60%
+  );
+  background-size: 200% auto;
+
+  /* show background only where text is */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  animation: shimmer 5.5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
+input[type="text"],
+input[type="email"],
+input[type="DOB"] {
+  margin-bottom: 15px;
+  padding: 12px;
+  width: 80%;
+  background: #1c1c10;
+  opacity: 0.9;
+  font-size: 17px;
+  font-family: 'Inter', sans-serif;
+  /* border: 1px solid white; */
+  border-radius: 20px;
+  color: white;
+  margin-left: 27px;
+}
+
+select {
+  margin-bottom: 3px;
+  padding: 12px;
+  width: 90%;
+  background: #1c1c10;
+  opacity: 0.9;
+  font-size: 17px;
+  font-family: 'Inter', sans-serif;
+  border: none; /* same as your inputs */
+  border-radius: 20px;
+  color: white;
+  margin-left: 0px;
+  appearance: none; /* removes default dropdown arrow (browser-specific) */
+}
+
+/* ---------- Custom Dropdown ---------- */
+.custom-dropdown {
+  position: relative;
+  width: 86%;
+  margin-left: 15px;
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent; 
+}
+
+.dropdown-display {
+  background: #1c1c10;
+  opacity: 0.9;
+  margin-left: -15px;
+  color: #fff;
+  padding: 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;    
+}
+
+.dropdown-options {
+  display: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background: #000;
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 9999;  
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  max-height: 200px;          /* avoid overflow on small screens */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dropdown-options label {
+  display: block;
+  color: #fff;
+  opacity: 0.9;
+  font-size: 15px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.dropdown-options input[type="checkbox"] {
+  color: none;
+  margin-right: 8px;
+}
+
+
+/* Show scrollbar nicely if multiple options */
+select[multiple] {
+  height: auto;
+  max-height: 120px; /* limit dropdown height */
+  overflow-y: auto;
+}
+
+
+/* Button styling */
+button {
+  display: block;
+  width: 50%;
+  margin: -5px auto;
+  padding: 10px 10px;
+  font-family: 'Satoshi', sans-serif;
+  font-size: 16px;
+  background: #1c1c10;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  position: relative; 
+
+  /* Subtle shadow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+  /* Smooth transitions for hover/click effects */
+  /* /* transition: all 0.2s ease; */
+  overflow: hidden; 
+} 
+
+/* Shimmer effect */
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  opacity: 65%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: button-shimmer 2.5s infinite;
+}
+
+/* Hover effect (optional: make it "lift" slightly) */
+button:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Click (active) effect */
+button:active {
+  transform: scale(0.97); /* shrinks slightly on click */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+} 
+
+/* Keyframes for shimmer */
+@keyframes button-shimmer {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Optional content container for alignment */
+.screen-content {
+  width: 100%;
+  max-width: 600px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background-color: #000000;
+  color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+}
+
+.close-button:hover {
+  color: #000;
+}
+
+#bottom-graphic {
+  position: fixed;
+  bottom: -90px;
+  left: 0px; /* move to bottom-left */
+  transform: rotate(0deg); /* rotate clockwise */
+  width: 100%;;
+  /* width: 153%; 110% + 30% = ~143% */
+  opacity: 0.9;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* #bottom-graphic {
+  position: fixed;
+  bottom: -80px;
+  left: -150px; /* move to bottom-left */
+  /* transform: rotate(18deg); rotate clockwise */
+  /* width: 100%;; */
+  /* width: 153%; 110% + 30% = ~143% */
+  /* opacity: 0.25;
+  z-index: 0;
+  pointer-events: none;
+} */ 
+
+#ticket-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+  border-radius: 12px;
+}
+
+#welcome-logo {
+  display: block;
+  margin: -20px auto -50px auto; /* top spacing, auto centers horizontally */
+  max-width: 70px;            /* adjust as needed */
+  height: auto;
+}
+
+
+/* Background: switch to Welcome_bg.png (keeps fixed behavior) */
+.bg-fixed {
+display: none;
+  background-image: none;
+background-size: cover;
+background-position: center center;
+z-index: -2;
+}
+
+
+/* Welcome screen: use absolute layout to match Figma coordinates */
+#screen-welcome {
+position: relative; /* container for absolute children */
+min-height: 100vh;
+}
+
+
+#welcome-title {
+font-family: 'Jersey 25', sans-serif;
+font-size: 100px; /* Jersey 25, Regular, 25 */
+line-height: 70px; /* as requested */
+font-weight: 400;
+color: white;
+position: absolute;
+left: 26px; /* X = 26 */
+top: 170px; /* Y = 236 */
+margin: 0;
+}
+
+
+
+#welcome-message {
+font-family: 'DM Sans', sans-serif;
+font-size: 24px; /* DM Sans, 24 */
+line-height: 29px; /* as requested */
+color: white;
+position: absolute;
+left: 147px; /* X = 147 */
+top: 350px; /* Y = 415 */
+margin: 0;
+}
+
+
+/* Welcome CTA – centered horizontally */
+#screen-welcome button {
+  position: fixed;
+  top: 480px;                /* keep vertical placement */
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: auto;               /* fit content */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 12px;
+  border-radius: 30px;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 22px;           /* arrow size */
+  line-height: 1;
+
+  box-shadow: 0 8px 24px rgba(4,4,6,0.4);
+  cursor: pointer;
+
+  margin: 0;
+  min-width: 0;
+}
+
+
+
+
+/* subtle hover to emphasize 'glass' feel */
+#screen-welcome button:hover {
+transform: translateX(-50%) translateY(-2px);
+background: rgba(255,255,255,0.08);
+}
+
+#screen-basic-info {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#screen-basic-info h2 {
+  font-family: 'Jersey 25', sans-serif;
+  font-size: 110px;
+  line-height: 83px;
+  font-weight: 400;
+  color: white;
+
+  position: absolute;
+  left: 27px;
+  top: 50px;
+
+  margin: 0;
+}
+
+#screen-basic-info p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 4px;
+  font-weight: 500;
+  color: white;
+
+  margin: 10px 0 6px 15px;
+  margin-left: 27px;
+}
+
+#screen-basic-info input {
+  box-sizing: border-box;
+
+  width: 327px;
+  height: 52px;
+
+  padding: 14px 14px;
+  margin-left: 27px;
+  margin-bottom: 18px;   /* vertical gap between inputs */
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 4px;
+  color: white;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  outline: none;
+}
+
+
+#screen-basic-info .form-stack {
+  position: absolute;
+  top: 230px;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+
+#screen-basic-info .form-stack button {
+  align-self: center;
+  margin-top: 24px;
+
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 12px;
+  border-radius: 30px;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(130%);
+
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 22px;
+
+  box-shadow: 0 8px 24px rgba(4,4,6,0.4);
+  cursor: pointer;
+}
+
+
+
+/* hover — same as welcome */
+#screen-basic-info button:hover {
+  transform: translateX(-50%) translateY(-2px);
+  background: rgba(255,255,255,0.08);
+}
+
+
+
+
+@media screen and (max-width: 768px) {
+  h1 {
+    margin-top: 20px; /* Less space on smaller screens */
+  }
+
+  h3 {
+    margin-top: 10px;
+  }
+}
+
+/* Loader screen */
+#screen-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-inner {
+  text-align: center;
+}
+
+.loader-text {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.loader-image {
+  width: 120px;
+  height: auto;
+}
+
+#screen-confirmation {
+  min-height: 100vh;     /* allow growth */
+  overflow-y: auto;     /* enable vertical scroll */
+  overflow-x: hidden;
+
+  position: relative;
+  background: url("assets/Confirmation_bg.png") center / cover no-repeat;
+  padding-bottom: 80px; 
+}
+
+
+/* Confirmation top icon */
+#confirmation-icon {
+  position: absolute;
+  left: 187px;
+  top: 58px;
+
+  width: 28px;
+  height: 28px;
+
+  object-fit: contain;
+  z-index: 2;
+}
+
+/* Confirmation status text */
+#confirmation-status-text {
+  position: absolute;
+  top: 96px;              /* space below the icon */
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+
+  /* Figma: -5% letter spacing */
+  letter-spacing: -0.7px;
+
+  text-align: center;
+  margin: 0;
+}
+
+#confirmation-status-text strong {
+  font-weight: 700;
+}
+
+/* Confirmation ticket image */
+/* Confirmation ticket image */
+#confirmation-ticket-image {
+  /* Define anchor variables */
+  --ticket-top: 148px;
+  --ticket-height: 600px;
+
+
+
+  width: 338px;
+  height: var(--ticket-height);
+
+  object-fit: contain;
+  /* z-index: 1; */
+}
+
+/* Ticket + hint wrapper */
+#confirmation-ticket-wrapper {
+  position: absolute;
+  left: 32px;
+  top: 148px;     /* ONE source of vertical truth */
+  width: 338px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* Confirmation download hint */
+#confirmation-download-hint {
+  margin-top: 12px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+
+  letter-spacing: -0.7px;
+  text-align: center;
+}
