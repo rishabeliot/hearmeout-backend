@@ -27,7 +27,8 @@ async function fetchAttendee(ticketId) {
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : `http://${window.location.hostname}:5000`;
+    : "https://hearmeout-backend-45l1.onrender.com";
+
 
 // const attendee = {
 //     "99999": { Name: "General admission", Price: 1500, Admits: "One admit", "Ticket ID": "99999"},
@@ -540,10 +541,10 @@ const amountInPaise = attendee.price * 100;
       // 🔴 NEW: mark in DB as booked
       await markBookingAsPaidInDB();
 
-      const redirectBase =
-        window.location.hostname === "localhost"
-          ? "http://localhost:5500"
-          : "https://hearmeoutcollective.in";
+      const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://hearmeout-backend-45l1.onrender.com";
 
       const redirectUrl = `${redirectBase}/?id=${ticketId}&paid=true`;
 
@@ -694,7 +695,7 @@ window.addEventListener("error", (event) => {
   const FRONTEND_BASE =
     window.location.hostname === "localhost"
       ? "http://localhost:5500/waitlist.html"
-      : "https://hearmeoutcollective.in/waitlist.html";
+      : "https://hearmeout-backend-45l1.onrender.com/waitlist.html";
 
   btn.addEventListener('click', async () => {
     const url = FRONTEND_BASE;

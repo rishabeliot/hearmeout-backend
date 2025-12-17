@@ -2,13 +2,13 @@
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : `http://${window.location.hostname}:5000`;
+    : `http://hearmeout-backend-45l1.onrender.com`;
 
 // Frontend base to generate ticket URLs
 const FRONTEND_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5500/index.html"
-    : "https://hearmeoutcollective.in/index.html";
+    : "https://hearmeout-backend-45l1.onrender.com/index.html";
 
 let allAttendees = [];
 let allWaitlist = [];          // store last fetched waitlist
