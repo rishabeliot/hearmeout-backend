@@ -202,6 +202,40 @@ app.get("/api/admin/attendees", (req, res) => {
   });
 });
 
+// TEMP: one-time DB import endpoint
+app.post("/api/admin/import-attendees", express.json(), (req, res) => {
+  const attendees = req.body;
+
+  if (!Array.isArray(attendees)) {
+    return res.status(400).json({ ok: false, error: "Invalid payload" });
+  }
+
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO attendees (ticket_id, name, price, admits)
+    VALUES (?, ?, ?, ?)
+  `);
+
+  try {
+    db.serialize(() => {
+      attendees.forEach(a => {
+        stmt.run(
+          a.ticket_id,
+          a.name,
+          a.price,
+          a.admits
+        );
+      });
+    });
+
+    stmt.finalize();
+    res.json({ ok: true, count: attendees.length });
+  } catch (err) {
+    console.error("Import failed:", err);
+    res.status(500).json({ ok: false });
+  }
+});
+
+
 // ---------- Admin: summary ----------
 app.get("/api/admin/summary", (req, res) => {
   const sqlTotalAttendees = `SELECT COUNT(*) AS total_attendees FROM attendees`;
