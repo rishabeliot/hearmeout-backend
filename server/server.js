@@ -66,8 +66,16 @@ function buildConfirmationEmail({ name, ticketId, admits, price }) {
 
 
 // ---------- SQLite setup ----------
-const dbPath = path.join(__dirname, "database.sqlite");
+const isProd = process.env.NODE_ENV === "production";
+
+const dbPath = isProd
+  ? "/data/database.sqlite"
+  : path.join(__dirname, "database.sqlite");
+
 const db = new sqlite3.Database(dbPath);
+
+console.log("📦 Using DB at:", dbPath);
+
 
 
 // Create tables if they don't exist
