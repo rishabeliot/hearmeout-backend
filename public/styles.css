@@ -407,8 +407,8 @@ body {
 }
 
 .loader-text {
-  font-family: 'League Spartan', sans-serif;
-  font-size: 18px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 25px;
   margin-bottom: 12px;
   color: #ffffff;
 }
@@ -1108,11 +1108,11 @@ background: rgba(255,255,255,0.08);
   text-align: center;
 }
 
-.loader-text {
+/* .loader-text {
   font-family: 'League Spartan', sans-serif;
   font-size: 22px;
   margin-bottom: 16px;
-}
+} */
 
 .loader-image {
   width: 120px;

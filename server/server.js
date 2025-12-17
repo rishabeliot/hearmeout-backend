@@ -19,10 +19,14 @@ const RAZORPAY_WEBHOOK_SECRET = "hmo_webhook_2025";
 // ---------- Email (Nodemailer) ----------
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false,
   auth: {
-    user: "rishabeliot@gmail.com",      // TODO: replace with your Gmail
-    pass: "yexdhdkldczqtiqh",    // TODO: replace with an App Password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   },
+  from: process.env.FROM_EMAIL
 });
 
 // Quick check (optional, we won't call this automatically)
@@ -44,15 +48,18 @@ function buildConfirmationEmail({ name, ticketId, admits, price }) {
   return `
     <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
       <h2>Hear Me Out – Booking Confirmed 🎟️</h2>
-      <p>Hey ${name || "there"},</p>
-      <p>Thanks for booking your spot at <strong>Hear Me Out</strong>.</p>
+      <p>Hey ${name || "there"}, you're in.</p>
+      <p>Thanks for grabbing your ticket to <strong>Hear Me Out</strong>.</p>
       <p>
-        <strong>Ticket ID:</strong> ${ticketId}<br/>
-        <strong>Admits:</strong> ${admits || "-"}<br/>
-        <strong>Price:</strong> ₹${price != null ? price : "-"}
+        <strong>Confirmation number:</strong> ${ticketId}<br/>
+        <strong>Event Details: </strong><br/>
+        📍 Location: <a href="https://maps.app.goo.gl/sJSA6HL7nvkaxY4CA"> Candles Brewhouse, 12th Floor, Azure, Hebbal </a>
+        📅 Date: 31st December
+        🕑 Time: 8pm onwards
       </p>
       <p>We can't wait to see you there.</p>
-      <p>Love,<br/>The Hear Me Out Collective</p>
+      <br>
+      <p>The Hear Me Out Collective</p>
     </div>
   `;
 }

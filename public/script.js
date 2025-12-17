@@ -437,7 +437,7 @@ const checkoutShareBtn = document.getElementById("checkout-share-btn");
 
 if (checkoutShareBtn) {
   checkoutShareBtn.addEventListener("click", async () => {
-    const shareUrl = "https://your-fixed-url-here.com";
+    const shareUrl = "https://hearmeoutcollective.in/waitlist";
 
     // Modern clipboard API (HTTPS / localhost)
     if (navigator.clipboard && window.isSecureContext) {
