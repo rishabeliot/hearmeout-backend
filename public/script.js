@@ -521,8 +521,8 @@ const amountInPaise = attendee.price * 100;
 
 
   const options = {
-    key: "rzp_live_6siEurfftpV6qb", // live
-    // key: "rzp_test_aLEqKxrmlyNhE1", // test
+    // key: "rzp_live_6siEurfftpV6qb", // live
+    key: "rzp_test_aLEqKxrmlyNhE1", // test
     amount: amountInPaise,
     currency: "INR",
     name: "Hear Me Out",
