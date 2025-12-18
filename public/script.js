@@ -547,7 +547,7 @@ const amountInPaise = attendee.price * 100;
     ? "http://localhost:5000"
     : "https://hearmeout-backend-45l1.onrender.com";
 
-      const redirectUrl = `${window.location.hostname}/?id=${ticketId}&paid=true`;
+      const redirectUrl = `https://hearmeoutcollective.in/?id=${ticketId}&paid=true`;
 
       window.location.href = redirectUrl;
       
