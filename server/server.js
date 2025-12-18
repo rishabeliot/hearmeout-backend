@@ -1,9 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { Pool } = require("pg");
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,24 +33,24 @@ app.use(cors());
 app.use(express.json());
 
 // ---------- Email (Nodemailer) ----------
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   host: process.env.SMTP_HOST,
+//   port: process.env.SMTP_PORT,
+//   secure: false,
+//   auth: {
+//     user: process.env.SMTP_USER,
+//     pass: process.env.SMTP_PASS
+//   }
+// });
 
-transporter.verify((err) => {
-  if (err) {
-    console.error("❌ Email transporter error:", err.message);
-  } else {
-    console.log("📧 Email transporter ready");
-  }
-});
+// transporter.verify((err) => {
+//   if (err) {
+//     console.error("❌ Email transporter error:", err.message);
+//   } else {
+//     console.log("📧 Email transporter ready");
+//   }
+// });
 
 function buildConfirmationEmail({ name, ticketId }) {
   return `
@@ -245,11 +249,13 @@ async function markPaidAndSendEmail(ticketId) {
     ticketId
   });
 
-  await transporter.sendMail({
-    to: email,
-    subject: "Your Hear Me Out Ticket Confirmation",
-    html
-  });
+  await resend.emails.send({
+  from: "Hear Me Out <onboarding@resend.dev>",
+  to: booking.email,
+  subject: "Your Hear Me Out Ticket Confirmation",
+  html
+});
+
 
   // 6. Mark email sent
   await pool.query(
