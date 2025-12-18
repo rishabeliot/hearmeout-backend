@@ -195,6 +195,7 @@ app.get("/api/admin/waitlist", async (req, res) => {
 
 // ---------- Mark paid + email ----------
 async function markPaidAndSendEmail(ticketId) {
+  // 1. Mark booking as paid (idempotent)
   const bookingRes = await pool.query(
     `
     UPDATE bookings
@@ -206,16 +207,26 @@ async function markPaidAndSendEmail(ticketId) {
   );
 
   const booking = bookingRes.rows[0];
-  if (!booking || booking.is_email_sent) return;
 
+  // No booking or email already sent → stop
+  if (!booking || booking.is_email_sent) {
+    return;
+  }
+
+  if (!booking.email) {
+    console.log("⚠️ No email found for ticket:", ticketId);
+    return;
+  }
+
+  // 2. Fetch attendee (for fallback name)
   const attendeeRes = await pool.query(
-    `SELECT * FROM attendees WHERE ticket_id = $1`,
+    `SELECT name FROM attendees WHERE ticket_id = $1`,
     [ticketId]
   );
 
   const attendee = attendeeRes.rows[0];
-  if (!booking.email) return;
 
+  // 3. Build & send email
   const html = buildConfirmationEmail({
     name: booking.name || attendee?.name,
     ticketId
@@ -227,11 +238,19 @@ async function markPaidAndSendEmail(ticketId) {
     html
   });
 
+  // 4. Mark email as sent
   await pool.query(
-    `UPDATE bookings SET is_email_sent = TRUE WHERE ticket_id = $1`,
+    `
+    UPDATE bookings
+    SET is_email_sent = TRUE
+    WHERE ticket_id = $1
+    `,
     [ticketId]
   );
+
+  console.log("📧 Confirmation email sent for ticket:", ticketId);
 }
+
 
 app.post("/api/bookings/mark-booked", async (req, res) => {
   const { ticketId } = req.body || {};

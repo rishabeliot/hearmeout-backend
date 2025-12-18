@@ -203,7 +203,7 @@ const redirectBase = window.location.origin;
 async function saveBasicInfoToDB() {
   try {
     const body = {
-      ticketId: formData.ticketId || ticketId,
+      ticketId: ticketId,
       name: formData.name,
       dob: formData.dob,
       mobile: formData.mobile,
@@ -549,9 +549,8 @@ const amountInPaise = attendee.price * 100;
 
       const redirectUrl = `${redirectBase}/?id=${ticketId}&paid=true`;
 
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 2000);
+      window.location.href = redirectUrl;
+      
     },
 
     prefill: {
@@ -651,36 +650,38 @@ window.addEventListener("load", () => {
   console.log("🔹 raw URL:", window.location.href);
   console.log("🔹 ticketId from URL params:", ticketId);
 
-  setTimeout(() => {
-    console.log("⏰ 3s timeout reached inside loader logic");
+  const isPaid = urlParams.get("paid") === "true";
+console.log("💰 isPaid flag from URL:", isPaid);
 
-    const isPaid = urlParams.get("paid") === "true";
-    console.log("💰 isPaid flag from URL:", isPaid);
+// Skip loader delay if coming back after payment
+const delay = isPaid ? 0 : 3000;
 
-    // const data = attendee[ticketId];
-    // console.log("📇 attendee for ticketId:", data);
-    console.log("📇 attendee loaded from DB:", attendee);
+setTimeout(() => {
+  console.log("⏰ loader routing");
 
-    // Invalid or missing ticket → show alert and stay on welcome
-    if (!ticketId || !attendee) {
-      alert("Invalid or missing ticket ID.");
-      goToScreen("welcome");
-      return;
-    }
+  console.log("📇 attendee loaded from DB:", attendee);
 
-    formData.ticketId = ticketId;
-    formData.name = attendee.name;
+  // Invalid or missing ticket
+  if (!ticketId || !attendee) {
+    alert("Invalid or missing ticket ID.");
+    goToScreen("welcome");
+    return;
+  }
 
-    console.log("💾 formData after loader:", formData);
+  formData.ticketId = ticketId;
+  formData.name = attendee.name;
 
-    if (isPaid) {
-      console.log("➡️ Routing to confirmation screen");
-      goToScreen("confirmation");
-    } else {
-      console.log("➡️ Routing to welcome screen");
-      goToScreen("welcome");
-    }
-  }, 3000); // 3-second loader
+  console.log("💾 formData after loader:", formData);
+
+  if (isPaid) {
+    console.log("➡️ Routing to confirmation screen");
+    goToScreen("confirmation");
+  } else {
+    console.log("➡️ Routing to welcome screen");
+    goToScreen("welcome");
+  }
+}, delay);
+
 });
 
 // Global error logger so we see if something blows up before this runs
