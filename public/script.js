@@ -197,6 +197,7 @@ let formData = {
   screenTimes: {}
 };
 
+const redirectBase = window.location.origin;
 
 // ---------- DB helpers (SQLite via Node backend) ----------
 async function saveBasicInfoToDB() {
@@ -534,9 +535,9 @@ const amountInPaise = attendee.price * 100;
       const timeSpent = now - currentScreenStartTime;
       formData.screenTimes[currentScreenId] = timeSpent;
 
-      console.log("📤 Calling sendFormDataToAirtable()");
+      // console.log("📤 Calling sendFormDataToAirtable()");
       // You can keep this for now or remove later if you fully move to SQLite
-      sendFormDataToAirtable();
+      // sendFormDataToAirtable();
 
       // 🔴 NEW: mark in DB as booked
       await markBookingAsPaidInDB();
