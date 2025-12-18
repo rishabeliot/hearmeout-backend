@@ -540,14 +540,14 @@ const amountInPaise = attendee.price * 100;
       // sendFormDataToAirtable();
 
       // 🔴 NEW: mark in DB as booked
-      await markBookingAsPaidInDB();
+      markBookingAsPaidInDB().catch(console.error);
 
       const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "https://hearmeout-backend-45l1.onrender.com";
 
-      const redirectUrl = `${redirectBase}/?id=${ticketId}&paid=true`;
+      const redirectUrl = `${window.location.hostname}/?id=${ticketId}&paid=true`;
 
       window.location.href = redirectUrl;
       
