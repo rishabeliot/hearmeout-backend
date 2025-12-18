@@ -8,6 +8,9 @@ const { Pool } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+console.log("🚀 SERVER VERSION 2025-01-EMAIL-FIX");
+
+
 // Razorpay webhook secret
 const RAZORPAY_WEBHOOK_SECRET = "hmo_webhook_2025";
 
@@ -195,6 +198,8 @@ app.get("/api/admin/waitlist", async (req, res) => {
 
 // ---------- Mark paid + email ----------
 async function markPaidAndSendEmail(ticketId) {
+  console.log("📧 markPaidAndSendEmail CALLED for", ticketId);
+
   // 1. Mark as booked (idempotent)
   const bookingRes = await pool.query(
     `
