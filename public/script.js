@@ -522,12 +522,12 @@ const amountInPaise = attendee.price * 100;
 
 
   const options = {
-    // key: "rzp_live_6siEurfftpV6qb", // live
-    key: "rzp_test_aLEqKxrmlyNhE1", // test
+    key: "rzp_live_6siEurfftpV6qb", // live
+    // key: "rzp_test_aLEqKxrmlyNhE1", // test
     amount: amountInPaise,
     currency: "INR",
     name: "Hear Me Out",
-    description: `Entry for ${attendee.Admits}`,
+    description: `Entry for ${attendee.admits}`,
         handler: async function (response) {
       console.log("✅ Payment success:", response);
 
@@ -645,43 +645,46 @@ async function sendFormDataToAirtable() {
 
 // ---------- Loader: 3 seconds, then route ----------
 // ✅ Step 9: After full load, show loader for 3s, then route (with logs)
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   console.log("🟢 window load fired");
   console.log("🔹 raw URL:", window.location.href);
   console.log("🔹 ticketId from URL params:", ticketId);
 
   const isPaid = urlParams.get("paid") === "true";
-console.log("💰 isPaid flag from URL:", isPaid);
+  console.log("💰 isPaid flag from URL:", isPaid);
 
-// Skip loader delay if coming back after payment
-const delay = isPaid ? 0 : 3000;
-
-setTimeout(() => {
-  console.log("⏰ loader routing");
-
-  console.log("📇 attendee loaded from DB:", attendee);
-
-  // Invalid or missing ticket
-  if (!ticketId || !attendee) {
-    alert("Invalid or missing ticket ID.");
+  try {
+    // 🔑 CRITICAL: ensure attendee is loaded before routing
+    if (!attendee && ticketId) {
+      attendee = await fetchAttendee(ticketId);
+      console.log("✅ Attendee reloaded in loader:", attendee);
+    }
+  } catch (err) {
+    alert("Invalid or expired ticket.");
     goToScreen("welcome");
     return;
   }
 
-  formData.ticketId = ticketId;
-  formData.name = attendee.name;
+  const delay = isPaid ? 0 : 3000;
 
-  console.log("💾 formData after loader:", formData);
+  setTimeout(() => {
+    if (!ticketId || !attendee) {
+      alert("Invalid or missing ticket ID.");
+      goToScreen("welcome");
+      return;
+    }
 
-  if (isPaid) {
-    console.log("➡️ Routing to confirmation screen");
-    goToScreen("confirmation");
-  } else {
-    console.log("➡️ Routing to welcome screen");
-    goToScreen("welcome");
-  }
-}, delay);
+    formData.ticketId = ticketId;
+    formData.name = attendee.name;
 
+    if (isPaid) {
+      console.log("➡️ Routing to confirmation screen");
+      goToScreen("confirmation");
+    } else {
+      console.log("➡️ Routing to welcome screen");
+      goToScreen("welcome");
+    }
+  }, delay);
 });
 
 // Global error logger so we see if something blows up before this runs

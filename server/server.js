@@ -195,7 +195,7 @@ app.get("/api/admin/waitlist", async (req, res) => {
 
 // ---------- Mark paid + email ----------
 async function markPaidAndSendEmail(ticketId) {
-  // 1. Mark booking as paid (idempotent)
+  // 1. Mark as booked (idempotent)
   const bookingRes = await pool.query(
     `
     UPDATE bookings
@@ -207,18 +207,26 @@ async function markPaidAndSendEmail(ticketId) {
   );
 
   const booking = bookingRes.rows[0];
+  if (!booking) return;
 
-  // No booking or email already sent → stop
-  if (!booking || booking.is_email_sent) {
-    return;
+  // 2. If email already sent, stop
+  if (booking.is_email_sent) return;
+
+  // 3. If email missing, retry fetch
+  let email = booking.email;
+  if (!email) {
+    const retry = await pool.query(
+      `SELECT email, name FROM bookings WHERE ticket_id = $1`,
+      [ticketId]
+    );
+    email = retry.rows[0]?.email;
+    if (!email) {
+      console.warn("⚠️ Email still missing, skipping send for", ticketId);
+      return;
+    }
   }
 
-  if (!booking.email) {
-    console.log("⚠️ No email found for ticket:", ticketId);
-    return;
-  }
-
-  // 2. Fetch attendee (for fallback name)
+  // 4. Fetch attendee for name fallback
   const attendeeRes = await pool.query(
     `SELECT name FROM attendees WHERE ticket_id = $1`,
     [ticketId]
@@ -226,19 +234,19 @@ async function markPaidAndSendEmail(ticketId) {
 
   const attendee = attendeeRes.rows[0];
 
-  // 3. Build & send email
+  // 5. Send email
   const html = buildConfirmationEmail({
     name: booking.name || attendee?.name,
     ticketId
   });
 
   await transporter.sendMail({
-    to: booking.email,
+    to: email,
     subject: "Your Hear Me Out Ticket Confirmation",
     html
   });
 
-  // 4. Mark email as sent
+  // 6. Mark email sent
   await pool.query(
     `
     UPDATE bookings
@@ -250,6 +258,7 @@ async function markPaidAndSendEmail(ticketId) {
 
   console.log("📧 Confirmation email sent for ticket:", ticketId);
 }
+
 
 
 app.post("/api/bookings/mark-booked", async (req, res) => {
