@@ -237,11 +237,27 @@ async function markBookingAsPaidInDB() {
 
     console.log("📤 Marking booking as paid in DB:", body);
 
-    const resp = await fetch(`${API_BASE}/api/bookings/mark-booked`, {
+    // const resp = await fetch(`${API_BASE}/api/bookings/mark-booked`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(body),
+    // });
+
+    const resp = fetch(`${API_BASE}/api/bookings/mark-booked`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ticketId })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("✅ mark-booked response:", data);
+      })
+      .catch(err => {
+        console.error("❌ mark-booked failed:", err);
+      });
+
 
     if (!resp.ok) {
       const text = await resp.text();
