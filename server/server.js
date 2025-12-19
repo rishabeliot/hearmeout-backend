@@ -295,6 +295,9 @@ await pool.query(
 
 
 app.post("/api/bookings/mark-booked", async (req, res) => {
+  console.log("🔥 /api/bookings/mark-booked HIT", req.body);
+
+  
   const { ticketId } = req.body || {};
   if (!ticketId) {
     return res.status(400).json({ ok: false });
