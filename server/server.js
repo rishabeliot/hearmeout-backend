@@ -52,6 +52,9 @@ app.use(express.json());
 //   }
 // });
 
+
+
+
 function buildConfirmationEmail({ name, ticketId }) {
   return `
     <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
@@ -204,63 +207,59 @@ app.get("/api/admin/waitlist", async (req, res) => {
 async function markPaidAndSendEmail(ticketId) {
   console.log("📧 markPaidAndSendEmail CALLED for", ticketId);
 
-  // 1️⃣ Ensure booking row exists + mark booked
-  const bookingRes = await pool.query(
+  // 1️⃣ Fetch attendee + booking data together
+  const result = await pool.query(
+    `
+    SELECT 
+      a.name,
+      b.email,
+      b.is_booked,
+      b.is_email_sent
+    FROM attendees a
+    LEFT JOIN bookings b ON a.ticket_id = b.ticket_id
+    WHERE a.ticket_id = $1
+    `,
+    [ticketId]
+  );
+
+  const row = result.rows[0];
+  if (!row) {
+    console.warn("⚠️ No attendee found for", ticketId);
+    return;
+  }
+
+  // 2️⃣ Ensure booking row exists + mark booked
+  await pool.query(
     `
     INSERT INTO bookings (ticket_id, is_booked)
     VALUES ($1, TRUE)
     ON CONFLICT (ticket_id)
     DO UPDATE SET is_booked = TRUE
-    RETURNING *
     `,
     [ticketId]
   );
 
-  const booking = bookingRes.rows[0];
-  if (!booking) {
-    console.warn("⚠️ No booking row after upsert for", ticketId);
-    return;
-  }
-
-  // 2️⃣ Stop if email already sent
-  if (booking.is_email_sent) {
+  // 3️⃣ Stop if email already sent
+  if (row.is_email_sent) {
     console.log("📭 Email already sent for", ticketId);
     return;
   }
 
-  // 3️⃣ Ensure email exists
-  let email = booking.email;
-  let name = booking.name;
-
-  if (!email) {
-    const retry = await pool.query(
-      `SELECT email, name FROM bookings WHERE ticket_id = $1`,
-      [ticketId]
-    );
-    email = retry.rows[0]?.email;
-    name = retry.rows[0]?.name;
-  }
-
-  if (!email) {
-    console.warn("⚠️ No email found for ticket", ticketId);
+  // 4️⃣ Ensure email exists
+  if (!row.email) {
+    console.warn("⚠️ No email found for", ticketId);
     return;
   }
 
-  // 4️⃣ Fallback attendee name
-  if (!name) {
-    const attendeeRes = await pool.query(
-      `SELECT name FROM attendees WHERE ticket_id = $1`,
-      [ticketId]
-    );
-    name = attendeeRes.rows[0]?.name || "there";
-  }
-
   // 5️⃣ Send email
-  const html = buildConfirmationEmail({ name, ticketId });
+  const html = buildConfirmationEmail({
+    name: row.name || "there",
+    ticketId
+  });
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM,
-    to: email,
+    from: "Hear Me Out <noreply@hearmeoutcollective.in>",
+    to: row.email,
     subject: "Your Hear Me Out Ticket Confirmation",
     html
   });
@@ -271,8 +270,9 @@ async function markPaidAndSendEmail(ticketId) {
     [ticketId]
   );
 
-  console.log("✅ Booking marked + email sent for", ticketId);
+  console.log("✅ Booking confirmed + email sent for", ticketId);
 }
+
 
 
 
