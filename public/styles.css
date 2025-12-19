@@ -13,7 +13,7 @@ body {
   overflow-y: auto;
 
   /* Background image + fallback color */
-  /* background: #ecebeb url('assets/Monkey.png') no-repeat center center fixed; */
+  /* background: #ecebeb url('assets/Monkey.webp') no-repeat center center fixed; */
   background-size: cover;
 
   position: relative;
@@ -71,18 +71,18 @@ body {
 
 /* Welcome background */
 #screen-welcome.active::before {
-  background-image: url("assets/Welcome_bg.png");
+  background-image: url("assets/Welcome_bg.webp");
   opacity: 1;
 }
 
 /* Basic Info background */
 #screen-basic-info.active::before {
-  background-image: url("assets/Basic_info_bg.png");
+  background-image: url("assets/Basic_info_bg.webp");
   opacity: 1;
 }
 
 #screen-checkout.active::before {
-  background-image: url("assets/Checkout_bg.png");
+  background-image: url("assets/Checkout_bg.webp");
   opacity: 1;
 }
 
@@ -897,7 +897,7 @@ button:active {
 }
 
 
-/* Background: switch to Welcome_bg.png (keeps fixed behavior) */
+/* Background: switch to Welcome_bg.webp (keeps fixed behavior) */
 .bg-fixed {
 display: none;
   background-image: none;
@@ -1125,7 +1125,7 @@ background: rgba(255,255,255,0.08);
   overflow-x: hidden;
 
   position: relative;
-  background: url("assets/Confirmation_bg.png") center / cover no-repeat;
+  background: url("assets/Confirmation_bg.webp") center / cover no-repeat;
   padding-bottom: 80px; 
 }
 
