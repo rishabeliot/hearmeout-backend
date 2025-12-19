@@ -146,6 +146,33 @@ app.get("/api/admin/attendees", async (req, res) => {
   }
 });
 
+// ---------- Admin: add attendee ----------
+app.post("/api/admin/attendees", async (req, res) => {
+  const { name, admits = 1, price = 0 } = req.body || {};
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ ok: false, error: "Name is required" });
+  }
+
+  try {
+    // Generate a new ticket_id (incremental, simple & safe)
+    const result = await pool.query(
+      `
+      INSERT INTO attendees (name, admits, price)
+      VALUES ($1, $2, $3)
+      RETURNING *
+      `,
+      [name.trim(), Number(admits) || 1, Number(price) || 0]
+    );
+
+    res.json({ ok: true, attendee: result.rows[0] });
+  } catch (err) {
+    console.error("Admin add attendee error:", err);
+    res.status(500).json({ ok: false, error: "Failed to add attendee" });
+  }
+});
+
+
 // ---------- Admin: summary ----------
 app.get("/api/admin/summary", async (req, res) => {
   try {
