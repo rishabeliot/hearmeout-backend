@@ -204,71 +204,76 @@ app.get("/api/admin/waitlist", async (req, res) => {
 async function markPaidAndSendEmail(ticketId) {
   console.log("📧 markPaidAndSendEmail CALLED for", ticketId);
 
-  // 1. Mark as booked (idempotent)
+  // 1️⃣ Ensure booking row exists + mark booked
   const bookingRes = await pool.query(
     `
-    UPDATE bookings
-    SET is_booked = TRUE
-    WHERE ticket_id = $1
+    INSERT INTO bookings (ticket_id, is_booked)
+    VALUES ($1, TRUE)
+    ON CONFLICT (ticket_id)
+    DO UPDATE SET is_booked = TRUE
     RETURNING *
     `,
     [ticketId]
   );
 
   const booking = bookingRes.rows[0];
-  if (!booking) return;
+  if (!booking) {
+    console.warn("⚠️ No booking row after upsert for", ticketId);
+    return;
+  }
 
-  // 2. If email already sent, stop
-  if (booking.is_email_sent) return;
+  // 2️⃣ Stop if email already sent
+  if (booking.is_email_sent) {
+    console.log("📭 Email already sent for", ticketId);
+    return;
+  }
 
-  // 3. If email missing, retry fetch
+  // 3️⃣ Ensure email exists
   let email = booking.email;
+  let name = booking.name;
+
   if (!email) {
     const retry = await pool.query(
       `SELECT email, name FROM bookings WHERE ticket_id = $1`,
       [ticketId]
     );
     email = retry.rows[0]?.email;
-    if (!email) {
-      console.warn("⚠️ Email still missing, skipping send for", ticketId);
-      return;
-    }
+    name = retry.rows[0]?.name;
   }
 
-  // 4. Fetch attendee for name fallback
-  const attendeeRes = await pool.query(
-    `SELECT name FROM attendees WHERE ticket_id = $1`,
-    [ticketId]
-  );
+  if (!email) {
+    console.warn("⚠️ No email found for ticket", ticketId);
+    return;
+  }
 
-  const attendee = attendeeRes.rows[0];
+  // 4️⃣ Fallback attendee name
+  if (!name) {
+    const attendeeRes = await pool.query(
+      `SELECT name FROM attendees WHERE ticket_id = $1`,
+      [ticketId]
+    );
+    name = attendeeRes.rows[0]?.name || "there";
+  }
 
-  // 5. Send email
-  const html = buildConfirmationEmail({
-    name: booking.name || attendee?.name,
-    ticketId
-  });
+  // 5️⃣ Send email
+  const html = buildConfirmationEmail({ name, ticketId });
 
   await resend.emails.send({
-  from: "Hear Me Out <onboarding@resend.dev>",
-  to: booking.email,
-  subject: "Your Hear Me Out Ticket Confirmation",
-  html
-});
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Your Hear Me Out Ticket Confirmation",
+    html
+  });
 
-
-  // 6. Mark email sent
+  // 6️⃣ Mark email sent
   await pool.query(
-    `
-    UPDATE bookings
-    SET is_email_sent = TRUE
-    WHERE ticket_id = $1
-    `,
+    `UPDATE bookings SET is_email_sent = TRUE WHERE ticket_id = $1`,
     [ticketId]
   );
 
-  console.log("📧 Confirmation email sent for ticket:", ticketId);
+  console.log("✅ Booking marked + email sent for", ticketId);
 }
+
 
 
 
