@@ -229,15 +229,32 @@ async function markPaidAndSendEmail(ticketId) {
   }
 
   // 2️⃣ Ensure booking row exists + mark booked
-  await pool.query(
-    `
-    INSERT INTO bookings (ticket_id, is_booked)
-    VALUES ($1, TRUE)
-    ON CONFLICT (ticket_id)
-    DO UPDATE SET is_booked = TRUE
-    `,
-    [ticketId]
-  );
+  // 2️⃣ Ensure booking row exists WITH REQUIRED FIELDS
+await pool.query(
+  `
+  INSERT INTO bookings (
+    ticket_id,
+    name,
+    email,
+    mobile,
+    is_booked
+  )
+  SELECT
+    a.ticket_id,
+    a.name,
+    b.email,
+    b.mobile,
+    TRUE
+  FROM attendees a
+  LEFT JOIN bookings b ON a.ticket_id = b.ticket_id
+  WHERE a.ticket_id = $1
+  ON CONFLICT (ticket_id)
+  DO UPDATE SET
+    is_booked = TRUE
+  `,
+  [ticketId]
+);
+
 
   // 3️⃣ Stop if email already sent
   if (row.is_email_sent) {
