@@ -2,7 +2,7 @@
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : `http://hearmeout-backend-45l1.onrender.com`;
+    : `https://hearmeout-backend-45l1.onrender.com`;
 
 // Frontend base to generate ticket URLs
 const FRONTEND_BASE =
