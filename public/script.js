@@ -230,43 +230,25 @@ async function saveBasicInfoToDB() {
 }
 
 async function markBookingAsPaidInDB() {
-  try {
-    const body = {
-      ticketId: formData.ticketId || ticketId,
-    };
+  const body = {
+    ticketId: formData.ticketId || ticketId,
+  };
 
-    console.log("📤 Marking booking as paid in DB:", body);
+  console.log("📤 Marking booking as paid in DB:", body);
 
-    // const resp = await fetch(`${API_BASE}/api/bookings/mark-booked`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(body),
-    // });
+  const resp = await fetch(`${API_BASE}/api/bookings/mark-booked`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
 
-    const resp = fetch(`${API_BASE}/api/bookings/mark-booked`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ ticketId })
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ mark-booked response:", data);
-      })
-      .catch(err => {
-        console.error("❌ mark-booked failed:", err);
-      });
+  const data = await resp.json();
+  console.log("✅ mark-booked response:", data);
 
-
-    if (!resp.ok) {
-      const text = await resp.text();
-      console.error("❌ DB mark-booked error:", resp.status, text);
-    } else {
-      console.log("✅ Booking marked as paid in DB");
-    }
-  } catch (err) {
-    console.error("❌ Network error while marking booking as paid:", err);
+  if (!resp.ok) {
+    throw new Error("mark-booked failed");
   }
 }
 
@@ -556,16 +538,28 @@ const amountInPaise = attendee.price * 100;
       // sendFormDataToAirtable();
 
       // 🔴 NEW: mark in DB as booked
-      markBookingAsPaidInDB().catch(console.error);
+  //     markBookingAsPaidInDB().catch(console.error);
 
-      const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://hearmeout-backend-45l1.onrender.com";
+  //     const API_BASE =
+  // window.location.hostname === "localhost"
+  //   ? "http://localhost:5000"
+  //   : "https://hearmeout-backend-45l1.onrender.com";
 
-      const redirectUrl = `https://hearmeoutcollective.in/?id=${ticketId}&paid=true`;
+  //     const redirectUrl = `https://hearmeoutcollective.in/?id=${ticketId}&paid=true`;
 
-      window.location.href = redirectUrl;
+  //     window.location.href = redirectUrl;
+
+      // 🔴 NEW: mark in DB as booked (MUST await)
+        try {
+          await markBookingAsPaidInDB();
+        } catch (err) {
+          console.error("❌ Failed to mark booking as paid:", err);
+        }
+
+        // ONLY redirect after backend confirms
+        const redirectUrl = `https://hearmeoutcollective.in/?id=${ticketId}&paid=true`;
+        window.location.href = redirectUrl;
+
       
     },
 
