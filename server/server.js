@@ -177,10 +177,10 @@ app.post("/api/admin/attendees", async (req, res) => {
 app.get("/api/admin/summary", async (req, res) => {
   try {
     const totalAttendees = await pool.query(
-      "SELECT COUNT(*) FROM attendees"
+      "SELECT COUNT(*) FROM attendees WHERE ticket_id < 4500"
     );
     const totalPurchases = await pool.query(
-      "SELECT COUNT(*) FROM bookings WHERE is_booked = TRUE"
+      "SELECT COUNT(*) FROM bookings WHERE is_booked = TRUE and ticket_id < 4500"
     );
 
     res.json({

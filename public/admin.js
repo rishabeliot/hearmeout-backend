@@ -78,7 +78,7 @@ function renderAttendees() {
   filtered.forEach((att) => {
     const tr = document.createElement("tr");
 
-    const url = `${FRONTEND_BASE}?id=${encodeURIComponent(att.ticket_id)}`;
+    const url = `https://hearmeoutcollective.in/?id=${encodeURIComponent(att.ticket_id)}`;
 
     tr.innerHTML = `
       <td>${att.ticket_id}</td>
@@ -103,7 +103,7 @@ function renderAttendees() {
         <a href="${url}" target="_blank" style="color:#93c5fd;">${url}</a>
       </td>
       <td>
-        <button class="copy-btn" data-url="${url}">Copy</button>
+        <button class="copy-btn" data-url="Hear Me Out into 2026. <br> Come thru to Candles Brewhouse on Dec 31st, from 8-1, <br> Book your spot using this link: ${url}">Copy</button>
       </td>
     `;
 
