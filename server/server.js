@@ -177,10 +177,10 @@ app.post("/api/admin/attendees", async (req, res) => {
 app.get("/api/admin/summary", async (req, res) => {
   try {
     const totalAttendees = await pool.query(
-      "SELECT COUNT(*) FROM attendees WHERE ticket_id < 4500"
+      "SELECT COUNT(*) FROM attendees WHERE ticket_id not in (49999, 49998, 49997, 49996, 49995, 49994)"
     );
     const totalPurchases = await pool.query(
-      "SELECT COUNT(*) FROM bookings WHERE is_booked = TRUE and ticket_id < 4500"
+      "SELECT COUNT(*) FROM bookings WHERE is_booked = TRUE and ticket_id not in (49999, 49998, 49997, 49996, 49995, 49994)"
     );
 
     res.json({
